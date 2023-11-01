@@ -22,12 +22,11 @@ enum Commands {
     /// Extract reads from a BAM file
     Extract {
         /// Read IDs
-        #[arg(short, long)]
         readids: String,
         /// Bam input file
-        #[arg(short, long)]
         input: PathBuf,
 
+        /// Is the output file a BAM file
         #[arg(short = 'b', default_value = "false")]
         isbam: bool,
     },

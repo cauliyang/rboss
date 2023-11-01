@@ -39,7 +39,6 @@ where
             ReadName::try_from(s.into_bytes())
                 .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
         })?;
-
         read_names.insert(read_name);
     }
 
