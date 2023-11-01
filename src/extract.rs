@@ -13,6 +13,7 @@ use noodles_sam::{
     record::ReadName,
 };
 
+use clap::crate_version;
 use std::path::PathBuf;
 
 fn writer(file: Option<&PathBuf>, is_bam: bool) -> Result<Box<dyn sam::AlignmentWriter>> {
@@ -55,12 +56,21 @@ where
 {
     let read_names = read_read_names(read_ids)?;
 
-    let mut reader = bam::reader::Builder.build_from_path(bam_file)?;
+    let mut reader = bam::reader::Builder.build_from_path(&bam_file)?;
     let mut header = reader.read_header()?;
 
-    let program = Map::<Program>::new();
+    let program = Map::<Program>::builder()
+        .set_name("rboss")
+        .set_version(crate_version!())
+        .set_command_line(format!(
+            "rboss extract {} {} {}",
+            read_ids,
+            bam_file.as_ref().to_string_lossy(),
+            if is_bam { "-b" } else { "" }
+        ))
+        .build()?;
 
-    header.add_comment("extracted with noodles");
+    header.programs_mut().insert(String::from("rboss"), program);
 
     let mut writer = writer(None, is_bam)?;
 
