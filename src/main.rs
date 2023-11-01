@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use env_logger::Builder;
 use human_panic::setup_panic;
+use log::info;
 use log::LevelFilter;
 use std::path::PathBuf;
 
@@ -41,11 +42,11 @@ fn main() {
 
     match cli.verbose.log_level() {
         Some(level) => {
-            println!("Verbose mode is on with level {}!", level);
+            info!("Verbose mode is on with level {}!", level);
             log_builder.filter(None, level.to_level_filter());
         }
         None => {
-            println!("Verbose mode is off!");
+            info!("Verbose mode is off!");
             log_builder.filter(None, LevelFilter::Off);
         }
     }
@@ -59,11 +60,11 @@ fn main() {
             input,
             isbam,
         }) => {
-            println!("'extract'  {readids:?} from {input:?} ");
+            info!("'extract'  {readids:?} from {input:?} ");
             extract::extract(readids, input, *isbam).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command
-        None => println!("No subcommand was used"),
+        None => info!("No subcommand was used"),
     }
 }
