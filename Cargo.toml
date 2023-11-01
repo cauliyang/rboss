@@ -6,7 +6,6 @@ authors = ["Yangyang Li"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-
 [profile.dev.package."*"]
 opt-level = 3 # Compile dependencies with optimizations on even in debug mode.
 
@@ -21,3 +20,10 @@ strip = false
 
 [dependencies]
 clap = { version = "4.4.7", features = ["wrap_help", "derive"] }
+noodles = { version = "0.56.0", features = ["bam", "sam", "bgzf", "core"] }
+anyhow = { version = "1.0" }
+clap-verbosity-flag = "2.1.0"
+human-panic = "1.2.1"
+log = "0.4"
+env_logger = "0.10"
+indicatif = "0.17"
