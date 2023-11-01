@@ -1,9 +1,10 @@
 use clap::{Parser, Subcommand};
 use env_logger::Builder;
 use human_panic::setup_panic;
-use log::max_level;
-use log::{debug, error, info, trace, warn, LevelFilter};
+use log::LevelFilter;
 use std::path::PathBuf;
+
+mod extract;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -22,10 +23,13 @@ enum Commands {
     Extract {
         /// Read IDs
         #[arg(short, long)]
-        readids: Option<String>,
+        readids: String,
         /// Bam input file
         #[arg(short, long)]
         input: PathBuf,
+
+        #[arg(short = 'b', default_value = "false")]
+        isbam: bool,
     },
 }
 
@@ -51,8 +55,13 @@ fn main() {
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli.command {
-        Some(Commands::Extract { readids, input }) => {
-            println!("'extract'  {readids:?} from {input:?} ")
+        Some(Commands::Extract {
+            readids,
+            input,
+            isbam,
+        }) => {
+            println!("'extract'  {readids:?} from {input:?} ");
+            extract::extract(readids, input, *isbam).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command
