@@ -7,7 +7,11 @@ use std::{
 };
 
 use noodles_bam as bam;
-use noodles_sam::{self as sam, record::ReadName};
+use noodles_sam::{
+    self as sam,
+    header::record::value::{map::Program, Map},
+    record::ReadName,
+};
 
 use std::path::PathBuf;
 
@@ -52,7 +56,11 @@ where
     let read_names = read_read_names(read_ids)?;
 
     let mut reader = bam::reader::Builder.build_from_path(bam_file)?;
-    let header = reader.read_header()?;
+    let mut header = reader.read_header()?;
+
+    let program = Map::<Program>::new();
+
+    header.add_comment("extracted with noodles");
 
     let mut writer = writer(None, is_bam)?;
 
