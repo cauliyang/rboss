@@ -6,6 +6,7 @@ use log::LevelFilter;
 use std::path::PathBuf;
 
 mod extract;
+mod index;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -30,6 +31,12 @@ enum Commands {
         /// Is the output file a BAM file
         #[arg(short = 'b', default_value = "false")]
         isbam: bool,
+    },
+
+    /// Index a BAM file
+    Index {
+        /// Bam input file
+        input: PathBuf,
     },
 }
 
@@ -62,6 +69,11 @@ fn main() {
         }) => {
             info!("'extract'  {readids:?} from {input:?} ");
             extract::extract(readids, input, *isbam).unwrap();
+        }
+
+        Some(Commands::Index { input }) => {
+            info!("'index'  {input:?} ");
+            index::index_bam(input).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command
