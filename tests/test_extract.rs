@@ -1,6 +1,5 @@
 use assert_cmd::cmd::Command;
-use pretty_assertions::{assert_eq, assert_ne};
-use sha256;
+use pretty_assertions::assert_eq;
 use std::fs;
 
 #[test]
@@ -16,7 +15,7 @@ fn test_extract() {
     let ground_truth_sha256 = sha256::digest(ground_truth.as_slice());
 
     let mut cmd = Command::cargo_bin("rboss").unwrap();
-    cmd.args(&[
+    cmd.args([
         "extract",
         "tests/data/extract_1.txt",
         "tests/data/reads.bam",
@@ -36,7 +35,7 @@ fn test_extract_binary() {
     let ground_truth_sha256 = sha256::digest(ground_truth.as_slice());
 
     let mut cmd = Command::cargo_bin("rboss").unwrap();
-    cmd.args(&[
+    cmd.args([
         "extract",
         "tests/data/extract_1.txt",
         "tests/data/reads.bam",
