@@ -45,9 +45,3 @@ repos:
         types: [file, rust]
         entry: cargo test
         pass_filenames: false
-
-  - repo: https://github.com/crate-ci/typos
-    rev: v1.16.21
-    hooks:
-      - id: typos
-        exclude: "extc|svg|psl|CHANGELOG"

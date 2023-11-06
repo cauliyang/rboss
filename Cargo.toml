@@ -45,3 +45,10 @@ noodles-csi = "0.26"
 noodles-fasta = "0.30"
 noodles-fastq = "0.9"
 noodles-sam = "0.46"
+
+# standard crate data is left out
+[dev-dependencies]
+assert_cmd = "2.0"
+assert_fs = "1.0"
+pretty_assertions = "1"
+sha256 = "1.4"
