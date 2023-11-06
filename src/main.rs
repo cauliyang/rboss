@@ -6,6 +6,8 @@ use log::LevelFilter;
 use std::path::PathBuf;
 
 mod extract;
+mod fa2fq;
+mod fq2fa;
 mod index;
 
 #[derive(Parser)]
@@ -36,6 +38,18 @@ enum Commands {
     /// Index a BAM file
     Index {
         /// Bam input file
+        input: PathBuf,
+    },
+
+    /// Convert a FASTA file to FASTQ
+    Fa2fq {
+        /// fasta input file
+        input: PathBuf,
+    },
+
+    /// Convert a FASTQ file to FASTA
+    Fq2fa {
+        /// fastq input file
         input: PathBuf,
     },
 }
@@ -74,6 +88,14 @@ fn main() {
         Some(Commands::Index { input }) => {
             info!("'index'  {input:?} ");
             index::index_bam(input).unwrap();
+        }
+        Some(Commands::Fa2fq { input }) => {
+            info!("'fa2fq'  {input:?} ");
+            fa2fq::fa2fq(input).unwrap();
+        }
+        Some(Commands::Fq2fa { input }) => {
+            info!("'fq2fa'  {input:?} ");
+            fq2fa::fq2fa(input).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command
