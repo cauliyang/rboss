@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Yangyang Li"]
 homepage = "https://github.com/cauliyang/rboss"
 documentation = "https://github.com/cauliyang/rboss"
-license = "LICENSE"
+license = "MIT"
 description = "Rust Bioinformatics Toolbox"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
