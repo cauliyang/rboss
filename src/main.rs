@@ -1,9 +1,12 @@
-use clap::{Parser, Subcommand};
+use clap::{Command, CommandFactory, Parser, Subcommand, ValueHint};
 use env_logger::Builder;
 use human_panic::setup_panic;
 use log::info;
 use log::LevelFilter;
 use std::path::PathBuf;
+
+use clap_complete::{generate, Generator, Shell};
+use std::io;
 
 mod extract;
 mod fa2fq;
@@ -11,24 +14,31 @@ mod fq2fa;
 mod index;
 mod rsoft;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
 struct Cli {
-    #[command(flatten)]
-    verbose: clap_verbosity_flag::Verbosity,
+    // If provided, outputs the completion file for given shell
+    #[arg(long = "generate", value_enum)]
+    generator: Option<Shell>,
 
     #[command(subcommand)]
     command: Option<Commands>,
+
+    #[command(flatten)]
+    verbose: clap_verbosity_flag::Verbosity,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Debug)]
 enum Commands {
     /// Extract reads from a BAM file
+    #[command(visible_alias = "e")]
     Extract {
         /// Read IDs
+        #[arg(value_hint = ValueHint::FilePath)]
         readids: String,
         /// Bam input file
+        #[arg(value_hint = ValueHint::FilePath)]
         input: PathBuf,
 
         /// Is the output file a BAM file
@@ -39,34 +49,42 @@ enum Commands {
     /// Index a BAM file
     Index {
         /// Bam input file
+        #[arg(value_hint = ValueHint::FilePath)]
         input: PathBuf,
     },
 
     /// Convert a FASTA file to FASTQ
     Fa2fq {
         /// fasta input file
+        #[arg(value_hint = ValueHint::FilePath)]
         input: PathBuf,
     },
 
     /// Convert a FASTQ file to FASTA
     Fq2fa {
         /// fastq input file
+        #[arg(value_hint = ValueHint::FilePath)]
         input: PathBuf,
     },
 
     /// Create softlinks to files with same suffix in one directory recursively
     Rsoft {
         /// The directory to search
+        #[arg(value_hint = ValueHint::FilePath)]
         source: PathBuf,
 
         /// The directory to create the softlinks. default is current directory
-        #[arg(short = 't')]
+        #[arg(short = 't', value_hint = ValueHint::FilePath)]
         target: Option<PathBuf>,
 
         /// The suffix of the files to link. default is all files
         #[arg(short = 's')]
         suffix: Option<String>,
     },
+}
+
+fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
+    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
 }
 
 fn main() {
@@ -87,6 +105,13 @@ fn main() {
         }
     }
     log_builder.init();
+
+    if let Some(generator) = cli.generator {
+        let mut cmd = Cli::command();
+        info!("Generating completion file for {generator:?}...");
+        print_completions(generator, &mut cmd);
+        return;
+    }
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
