@@ -57,8 +57,13 @@ enum Commands {
     /// Create softlinks to files with same suffix in one directory recursively
     Rsoft {
         /// The directory to search
-        target: PathBuf,
-        /// The suffix of the files to link default is all files
+        source: PathBuf,
+
+        /// The directory to create the softlinks. default is current directory
+        #[arg(short = 't')]
+        target: Option<PathBuf>,
+
+        /// The suffix of the files to link. default is all files
         #[arg(short = 's')]
         suffix: Option<String>,
     },
@@ -110,9 +115,13 @@ fn main() {
             fq2fa::fq2fa(input).unwrap();
         }
 
-        Some(Commands::Rsoft { target, suffix }) => {
+        Some(Commands::Rsoft {
+            source,
+            target,
+            suffix,
+        }) => {
             info!("'rsoft'  {target:?} {suffix:?} ");
-            rsoft::rsoft(target, suffix.clone()).unwrap();
+            rsoft::rsoft(source, target.as_ref(), suffix.clone()).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command

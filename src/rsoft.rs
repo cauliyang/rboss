@@ -11,7 +11,11 @@ use std::os::unix::fs as unix_fs;
 #[cfg(windows)]
 use std::os::windows::fs as windows_fs;
 
-pub fn rsoft<P: AsRef<Path>>(target_directory: P, suffix: Option<String>) -> Result<()> {
+pub fn rsoft<P: AsRef<Path>>(
+    source_directory: P,
+    target_directory: Option<P>,
+    suffix: Option<String>,
+) -> Result<()> {
     let pattern = if suffix.is_some() {
         format!(r".*\.{}", suffix.unwrap())
     } else {
@@ -19,9 +23,13 @@ pub fn rsoft<P: AsRef<Path>>(target_directory: P, suffix: Option<String>) -> Res
     };
 
     let re = Regex::new(&pattern).unwrap();
-    let current_directory = env::current_dir().unwrap();
 
-    for entry in WalkDir::new(target_directory)
+    let mut current_directory = env::current_dir().unwrap();
+    if target_directory.is_some() {
+        current_directory = target_directory.unwrap().as_ref().to_path_buf();
+    }
+
+    for entry in WalkDir::new(source_directory)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| e.path().is_file() && re.is_match(&e.path().to_string_lossy()))
