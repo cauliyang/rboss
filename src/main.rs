@@ -78,8 +78,12 @@ enum Commands {
         target: Option<PathBuf>,
 
         /// The suffix of the files to link. default is all files
-        #[arg(short = 's')]
-        suffix: Option<String>,
+        #[arg(short = 's', value_delimiter = ' ', num_args=1..)]
+        suffix: Option<Vec<String>>,
+
+        /// Overwrite existing files
+        #[arg(short = 'o', default_value = "false")]
+        overwrite: bool,
     },
 }
 
@@ -144,9 +148,10 @@ fn main() {
             source,
             target,
             suffix,
+            overwrite,
         }) => {
             info!("'rsoft'  {target:?} {suffix:?} ");
-            rsoft::rsoft(source, target.as_ref(), suffix.clone()).unwrap();
+            rsoft::rsoft(source, target.as_ref(), suffix.clone(), *overwrite).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command

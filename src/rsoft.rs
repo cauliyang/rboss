@@ -14,31 +14,43 @@ use std::os::windows::fs as windows_fs;
 pub fn rsoft<P: AsRef<Path>>(
     source_directory: P,
     target_directory: Option<P>,
-    suffix: Option<String>,
+    suffix: Option<Vec<String>>,
+    overwrite: bool,
 ) -> Result<()> {
     let pattern = if suffix.is_some() {
-        format!(r".*\.{}", suffix.unwrap())
+        let suffix_re = suffix
+            .unwrap()
+            .iter()
+            .map(|s| regex::escape(s))
+            .collect::<Vec<_>>()
+            .join("|");
+
+        format!(r".*\.({})$", suffix_re)
     } else {
         ".*".to_string()
     };
 
     let re = Regex::new(&pattern).unwrap();
 
-    let mut current_directory = env::current_dir().unwrap();
+    let mut target_dir = env::current_dir().unwrap();
     if target_directory.is_some() {
-        current_directory = target_directory.unwrap().as_ref().to_path_buf();
+        target_dir = target_directory.unwrap().as_ref().to_path_buf();
     }
 
-    for entry in WalkDir::new(source_directory)
+    // make target dir become absolute
+    target_dir = target_dir.canonicalize()?;
+    let source_dir = source_directory.as_ref().canonicalize()?;
+
+    for entry in WalkDir::new(source_dir)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| e.path().is_file() && re.is_match(&e.path().to_string_lossy()))
     {
         let path = entry.path();
 
-        let link_name = current_directory.join(path.file_name().unwrap());
+        let link_name = target_dir.join(path.file_name().unwrap());
 
-        if !link_name.exists() {
+        if !link_name.exists() || overwrite {
             #[cfg(unix)]
             {
                 if let Err(e) = unix_fs::symlink(path, &link_name) {
