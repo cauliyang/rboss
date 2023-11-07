@@ -9,6 +9,7 @@ mod extract;
 mod fa2fq;
 mod fq2fa;
 mod index;
+mod rsoft;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -52,6 +53,15 @@ enum Commands {
         /// fastq input file
         input: PathBuf,
     },
+
+    /// Create softlinks to files with same suffix in one directory recursively
+    Rsoft {
+        /// The directory to search
+        target: PathBuf,
+        /// The suffix of the files to link default is all files
+        #[arg(short = 's')]
+        suffix: Option<String>,
+    },
 }
 
 fn main() {
@@ -89,13 +99,20 @@ fn main() {
             info!("'index'  {input:?} ");
             index::index_bam(input).unwrap();
         }
+
         Some(Commands::Fa2fq { input }) => {
             info!("'fa2fq'  {input:?} ");
             fa2fq::fa2fq(input).unwrap();
         }
+
         Some(Commands::Fq2fa { input }) => {
             info!("'fq2fa'  {input:?} ");
             fq2fa::fq2fa(input).unwrap();
+        }
+
+        Some(Commands::Rsoft { target, suffix }) => {
+            info!("'rsoft'  {target:?} {suffix:?} ");
+            rsoft::rsoft(target, suffix.clone()).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command
