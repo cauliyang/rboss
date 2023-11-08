@@ -11,6 +11,7 @@ use std::io;
 mod extract;
 mod fa2fq;
 mod fq2fa;
+mod graph;
 mod index;
 mod rsoft;
 
