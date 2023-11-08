@@ -11,9 +11,10 @@ use std::io;
 mod extract;
 mod fa2fq;
 mod fq2fa;
-mod graph;
 mod index;
 mod rsoft;
+
+mod graph;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -68,7 +69,7 @@ enum Commands {
         input: PathBuf,
     },
 
-    /// Create softlinks to files with same suffix in one directory recursively
+    /// Create softlinks to files with suffix recursively
     Rsoft {
         /// The directory to search
         #[arg(value_hint = ValueHint::FilePath)]
@@ -86,6 +87,9 @@ enum Commands {
         #[arg(short = 'o', default_value = "false")]
         overwrite: bool,
     },
+
+    /// Graph Analysis
+    Graph(graph::GraphArgs),
 }
 
 fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
@@ -153,6 +157,10 @@ fn main() {
         }) => {
             info!("'rsoft'  {target:?} {suffix:?} ");
             rsoft::rsoft(source, target.as_ref(), suffix.clone(), *overwrite).unwrap();
+        }
+
+        Some(Commands::Graph(args)) => {
+            info!("'graph'  {args:?} ");
         }
 
         // If no subcommand was used, it's a normal top level command
