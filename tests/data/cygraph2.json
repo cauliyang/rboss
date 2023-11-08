@@ -1,0 +1,45 @@
+{
+	"data": [],
+	"directed": true,
+	"multigraph": true,
+	"elements": {
+		"nodes": [
+			{
+				"data": {
+					"chrom": "chr1",
+					"ref_start": 154220171,
+					"ref_end": 154261697,
+					"strand": "+",
+					"is_head": true,
+					"id": "chr1_154220171_154261697_H+",
+					"value": "chr1_154220171_154261697_H+",
+					"name": "chr1_154220171_154261697_H+"
+				}
+			},
+			{
+				"data": {
+					"chrom": "chr2",
+					"ref_start": 80617598,
+					"ref_end": 80666408,
+					"strand": "-",
+					"is_head": false,
+					"id": "chr2_80617598_80666408_T-",
+					"value": "chr2_80617598_80666408_T-",
+					"name": "chr2_80617598_80666408_T-"
+				}
+			}
+		],
+		"edges": [
+			{
+				"data": {
+					"label": "TRA_(False, MicroHomology(G))_1",
+					"weight": 1,
+					"read_ids": ["m64135_201204_204719/97059215/ccs"],
+					"source": "chr1_154220171_154261697_H+",
+					"target": "chr2_80617598_80666408_T-",
+					"key": 0
+				}
+			}
+		]
+	}
+}

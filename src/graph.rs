@@ -3,6 +3,7 @@ use clap::ValueHint;
 use std::path::PathBuf;
 
 mod analysis;
+mod data;
 mod load;
 
 #[derive(Args, Debug)]
