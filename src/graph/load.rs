@@ -4,16 +4,45 @@ use petgraph::Graph;
 use serde_json::Value;
 use std::path::Path;
 
+use std::collections::HashMap;
+
 use crate::graph::data::{EdgeData, NodeData};
 
-pub fn load_cygraph<P: AsRef<Path>>(input: P) -> Result<()> {
-    info!("Loading graph from {:?}", input.as_ref());
-    let reader = std::io::BufReader::new(std::fs::File::open(input.as_ref())?);
-    let data = serde_json::from_reader(reader)?;
+pub fn load_cygraph_from_file<P: AsRef<Path>>(file: P) -> Result<Graph<NodeData, EdgeData>> {
+    let reader = std::io::BufReader::new(std::fs::File::open(file.as_ref())?);
+    let data: Value = serde_json::from_reader(reader)?;
+    load_cygraph_from_json(data)
+}
 
-    let mut graph = Graph::<NodeData, EdgeData>::new();
+pub fn load_cygraph_from_json(data: Value) -> Result<Graph<NodeData, EdgeData>> {
+    let nodes = data.get("elements").unwrap().get("nodes").unwrap();
+    let edges = data.get("elements").unwrap().get("edges").unwrap();
 
-    Ok(())
+    let node_number = nodes.as_array().unwrap().len();
+    let edge_number = edges.as_array().unwrap().len();
+
+    let mut graph = Graph::<NodeData, EdgeData>::with_capacity(node_number, edge_number);
+
+    let mut id2index = HashMap::new();
+
+    for node in nodes.as_array().unwrap() {
+        let node_data = NodeData::from_json(node);
+        let id = node_data.id.clone();
+        let index = graph.add_node(node_data);
+        id2index.insert(id, index);
+    }
+
+    for edge in edges.as_array().unwrap() {
+        let edge_data = EdgeData::from_json(edge);
+        let source = id2index.get(&edge_data.source).unwrap();
+        let target = id2index.get(&edge_data.target).unwrap();
+        let index = graph.add_edge(*source, *target, edge_data);
+    }
+
+    info!("Added {} nodes", graph.node_count());
+    info!("Added {} edges", graph.edge_count());
+
+    Ok(graph)
 }
 
 #[cfg(test)]
@@ -68,8 +97,6 @@ mod tests {
                 ]
             }
          }"#;
-
-        let v: Value = serde_json::from_str(data).unwrap();
-        serde_json::to_writer_pretty(std::io::stdout(), &v).unwrap();
+        load_cygraph_from_json(serde_json::from_str(data).unwrap()).unwrap();
     }
 }
