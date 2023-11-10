@@ -54,6 +54,8 @@ noodles-fastq = "0.9"
 noodles-sam = "0.46"
 
 petgraph = { version = "0.6", features = ["serde-1"] }
+plotters = { version = "0.3" }
+rayon = { version = "1.8" }
 regex = { version = "1.10" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }

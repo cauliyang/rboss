@@ -160,7 +160,7 @@ fn main() {
 
         Some(Commands::Graph(args)) => {
             info!("'graph'  {args:?} ");
-            graph::analyze_nlgraph(args).unwrap();
+            graph::analyze(args).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command

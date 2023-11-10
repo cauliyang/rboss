@@ -2,15 +2,27 @@ use anyhow::Result;
 use log::info;
 use serde_json::Value;
 use std::path::Path;
+use walkdir::WalkDir;
 
 use std::collections::HashMap;
 
 use crate::graph::data::{EdgeData, NLGraph, NodeData};
 
+pub fn load_cygraph_from_directory<P: AsRef<Path>>(directory: P) -> Result<Vec<NLGraph>> {
+    WalkDir::new(directory)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_file() && e.path().extension().unwrap() == "json")
+        .map(|e| load_cygraph_from_file(e.path()))
+        .collect::<Result<Vec<NLGraph>>>()
+}
+
 pub fn load_cygraph_from_file<P: AsRef<Path>>(file: P) -> Result<NLGraph> {
     let reader = std::io::BufReader::new(std::fs::File::open(file.as_ref())?);
     let data: Value = serde_json::from_reader(reader)?;
-    load_cygraph_from_json(data)
+    let result = load_cygraph_from_json(data);
+    info!("load nlgraph from json {}", file.as_ref().display());
+    result
 }
 
 pub fn load_cygraph_from_json(data: Value) -> Result<NLGraph> {
@@ -37,9 +49,6 @@ pub fn load_cygraph_from_json(data: Value) -> Result<NLGraph> {
         let target = id2index.get(&edge_data.target).unwrap();
         let _index = graph.add_edge(*source, *target, edge_data);
     }
-
-    info!("Added {} nodes", graph.node_count());
-    info!("Added {} edges", graph.edge_count());
 
     Ok(graph)
 }
