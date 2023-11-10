@@ -69,7 +69,7 @@ enum Commands {
         input: PathBuf,
     },
 
-    /// Create softlinks to files with suffix recursively
+    /// Create soft links to files with suffix recursively
     Rsoft {
         /// The directory to search
         #[arg(value_hint = ValueHint::FilePath)]
@@ -78,7 +78,6 @@ enum Commands {
         /// The directory to create the softlinks. default is current directory
         #[arg(short = 't', value_hint = ValueHint::FilePath)]
         target: Option<PathBuf>,
-
         /// The suffix of the files to link. default is all files
         #[arg(short = 's', value_delimiter = ' ', num_args=1..)]
         suffix: Option<Vec<String>>,
@@ -161,6 +160,7 @@ fn main() {
 
         Some(Commands::Graph(args)) => {
             info!("'graph'  {args:?} ");
+            graph::analyze_nlgraph(args).unwrap();
         }
 
         // If no subcommand was used, it's a normal top level command

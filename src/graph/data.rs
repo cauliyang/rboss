@@ -1,8 +1,14 @@
+use petgraph::Graph;
 use serde_json::Value;
 use std::str::FromStr;
 
-#[derive(Debug)]
+pub type NLGraph = Graph<NodeData, EdgeData>;
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub enum Strand {
+    #[default]
     Positive,
     Negative,
 }
@@ -16,6 +22,7 @@ impl Strand {
         }
     }
 
+    #[allow(dead_code)]
     pub fn is_reverse(&self) -> bool {
         match self {
             Strand::Positive => false,
@@ -35,7 +42,7 @@ impl FromStr for Strand {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct NodeData {
     pub id: String,
     pub label: String,
@@ -44,9 +51,18 @@ pub struct NodeData {
     pub ref_end: u64,
     pub strand: Strand,
     pub is_head: bool,
+    // node attributes
+    pub indegree: usize,
+    pub outdegree: usize,
+    pub in_degree_centrality: f32,
+    pub out_degree_centrality: f32,
+    pub clostness_centrality: f32,
+
+    // local clustering measures
+    pub local_clustering_coefficient: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct EdgeData {
     pub label: String,
     pub weight: u64,
@@ -57,9 +73,11 @@ pub struct EdgeData {
 
 impl NodeData {
     pub fn from_json(node_data: &Value) -> Self {
-        // node: Object {"data": Object {"chrom": String("chr1"),
-        // "id": String("chr1_154220171_154261697_H+"
-        // ), "is_head": Bool(true), "name": String("chr1_154220171_154261697_H+"),
+        // node: Object {"data": Object {
+        // "chrom": String("chr1"),
+        // "id": String("chr1_154220171_154261697_H+"),
+        // "is_head": Bool(true),
+        // "name": String("chr1_154220171_154261697_H+"),
         // "ref_end": Number(154261697),
         // "ref_start": Number(154220171),
         // "strand": String("+"),
@@ -73,6 +91,7 @@ impl NodeData {
         let ref_end = node.get("ref_end").unwrap().as_u64().unwrap();
         let strand = Strand::new(node.get("strand").unwrap().as_str().unwrap());
         let is_head = node.get("is_head").unwrap().as_bool().unwrap();
+
         Self {
             id,
             label,
@@ -81,18 +100,19 @@ impl NodeData {
             ref_end,
             strand,
             is_head,
+            ..Default::default()
         }
     }
 }
 
 impl EdgeData {
     pub fn from_json(edge_data: &Value) -> Self {
-        //         Object {"data": Object {"key": Number(0),
-        //         "label": String("TRA_(False, MicroHomology(G))_1"),
-        //         "read_ids": Array [String("m64135_201204_204719/97059215/ccs")],
-        //         "source": String("chr1_154220171_154261697_H+"),
-        //         "target": String("chr2_80617598_80666408_T-"),
-        //         "weight": Number(1)}}
+        //   Object {"data": Object {"key": Number(0),
+        //   "label": String("TRA_(False, MicroHomology(G))_1"),
+        //   "read_ids": Array [String("m64135_201204_204719/97059215/ccs")],
+        //   "source": String("chr1_154220171_154261697_H+"),
+        //   "target": String("chr2_80617598_80666408_T-"),
+        //   "weight": Number(1)}}
 
         let edge = edge_data.get("data").unwrap();
         let label = edge.get("label").unwrap().as_str().unwrap().to_string();
@@ -116,5 +136,16 @@ impl EdgeData {
             source,
             target,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_strand() {
+        let strand = Strand::new("+");
+        assert!(!strand.is_reverse());
     }
 }
