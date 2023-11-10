@@ -5,7 +5,6 @@ use std::path::Path;
 
 pub fn fa2fq<P: AsRef<Path>>(input: P) -> Result<()> {
     let mut reader = fasta::reader::Builder.build_from_path(input)?;
-
     let mut writer = fastq::Writer::new(std::io::stdout());
 
     for result in reader.records() {
