@@ -55,11 +55,12 @@ noodles-sam = "0.46"
 
 petgraph = { version = "0.6", features = ["serde-1"] }
 plotters = { version = "0.3" }
+
+polars = { version = "0.34", features = ["lazy"] }
 rayon = { version = "1.8" }
 regex = { version = "1.10" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }
-
 walkdir = { version = "2.4" }
 
 # standard crate data is left out
