@@ -46,7 +46,7 @@ human-panic = "1.2.1"
 indicatif = "0.17"
 log = "0.4"
 
-noodles-bam = "0.49.0"
+noodles-bam = "0.51.0"
 noodles-bgzf = "0.25"
 noodles-csi = "0.28"
 noodles-fasta = "0.30"
