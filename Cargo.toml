@@ -51,7 +51,7 @@ noodles-bgzf = "0.25"
 noodles-csi = "0.28"
 noodles-fasta = "0.30"
 noodles-fastq = "0.9"
-noodles-sam = "0.46"
+noodles-sam = "0.48"
 
 petgraph = { version = "0.6", features = ["serde-1"] }
 plotters = { version = "0.3" }
