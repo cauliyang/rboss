@@ -8,6 +8,7 @@ use std::path::PathBuf;
 
 mod analysis;
 mod data;
+mod ged;
 mod load;
 // mod vis;
 
