@@ -47,7 +47,7 @@ indicatif = "0.17"
 log = "0.4"
 
 noodles-bam = "0.51.0"
-noodles-bgzf = "0.25"
+noodles-bgzf = "0.26"
 noodles-csi = "0.28"
 noodles-fasta = "0.30"
 noodles-fastq = "0.9"
