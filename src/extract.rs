@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
 use std::{
     collections::HashSet,
     fs::File,
@@ -32,7 +32,7 @@ fn writer(file: Option<&PathBuf>, is_bam: bool) -> Result<Box<dyn sam::Alignment
     Ok(writer)
 }
 
-fn read_read_names<P>(src: P) -> Result<HashSet<ReadName>>
+fn read_read_names_from_file<P>(src: P) -> Result<HashSet<ReadName>>
 where
     P: AsRef<Path>,
 {
@@ -50,11 +50,28 @@ where
     Ok(read_names)
 }
 
+fn parse_read_ids(read_ids: &str) -> Result<HashSet<ReadName>> {
+    if read_ids.is_empty() {
+        return Ok(HashSet::new());
+    }
+
+    if let Ok(read_ids_path) = Path::new(read_ids).canonicalize() {
+        if read_ids_path.exists() {
+            return read_read_names_from_file(read_ids);
+        }
+    }
+
+    read_ids
+        .split(',')
+        .map(|id| ReadName::try_from(id.as_bytes().to_vec()).map_err(Error::from)) // Replace with the actual method to create ReadName from &str
+        .collect::<Result<HashSet<_>, _>>() // Assuming
+}
+
 pub fn extract<P>(read_ids: &str, bam_file: P, is_bam: bool) -> Result<()>
 where
     P: AsRef<std::path::Path>,
 {
-    let read_names = read_read_names(read_ids)?;
+    let read_names = parse_read_ids(read_ids)?;
 
     let mut reader = bam::reader::Builder.build_from_path(&bam_file)?;
     let mut header = reader.read_header()?;

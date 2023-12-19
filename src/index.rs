@@ -2,7 +2,7 @@ use std::io;
 use std::path::Path;
 
 use noodles_bam::{self as bam, bai};
-use noodles_csi::{self as csi, index::reference_sequence::bin::Chunk};
+use noodles_csi::binning_index::{index::reference_sequence::bin::Chunk, Indexer};
 use noodles_sam::{self as sam, alignment::Record};
 
 fn is_coordinate_sorted(header: &sam::Header) -> bool {
@@ -30,7 +30,7 @@ pub fn index_bam<P: AsRef<Path>>(file: P) -> io::Result<()> {
 
     let mut record = Record::default();
 
-    let mut builder = csi::index::Indexer::default();
+    let mut builder = Indexer::default();
     let mut start_position = reader.virtual_position();
 
     while reader.read_record(&header, &mut record)? != 0 {
@@ -59,7 +59,6 @@ pub fn index_bam<P: AsRef<Path>>(file: P) -> io::Result<()> {
     // write to index file
     let stdout = io::stdout().lock();
     let mut writer = bai::Writer::new(stdout);
-    writer.write_header()?;
     writer.write_index(&index)?;
 
     Ok(())

@@ -39,6 +39,7 @@ enum Commands {
         /// Read IDs
         #[arg(value_hint = ValueHint::FilePath)]
         readids: String,
+
         /// Bam input file
         #[arg(value_hint = ValueHint::FilePath)]
         input: PathBuf,
