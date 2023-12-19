@@ -17,7 +17,7 @@ fn is_coordinate_sorted(header: &sam::Header) -> bool {
     false
 }
 
-pub fn index_bam<P: AsRef<Path>>(file: P) -> io::Result<()> {
+pub fn index_bam<P: AsRef<Path>, W: io::Write>(file: P, index_file: Option<W>) -> io::Result<()> {
     let mut reader = bam::reader::Builder.build_from_path(file.as_ref())?;
     let header = reader.read_header()?;
 
@@ -54,12 +54,15 @@ pub fn index_bam<P: AsRef<Path>>(file: P) -> io::Result<()> {
     }
 
     let index = builder.build(header.reference_sequences().len());
-    // let index_file = file.as_ref().with_extension("bai");
 
-    // write to index file
-    let stdout = io::stdout().lock();
-    let mut writer = bai::Writer::new(stdout);
-    writer.write_index(&index)?;
+    if let Some(index_file) = index_file {
+        let mut writer = bai::Writer::new(index_file);
+        writer.write_index(&index)?;
+    } else {
+        let stdout = io::stdout().lock();
+        let mut writer = bai::Writer::new(stdout);
+        writer.write_index(&index)?;
+    }
 
     Ok(())
 }

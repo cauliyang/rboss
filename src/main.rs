@@ -136,7 +136,7 @@ fn main() {
 
         Some(Commands::Index { input }) => {
             info!("'index'  {input:?} ");
-            index::index_bam(input).unwrap();
+            index::index_bam(input, None::<Box<dyn io::Write>>).unwrap();
         }
 
         Some(Commands::Fa2fq { input }) => {
