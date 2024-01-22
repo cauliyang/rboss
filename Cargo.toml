@@ -43,7 +43,7 @@ clap = { version = "4.4.17", features = ["wrap_help", "derive", "cargo"] }
 clap-verbosity-flag = "2.1.1"
 clap_complete = "4.4"
 colored = "2"
-env_logger = "0.10"
+env_logger = "0.11"
 human-panic = "1.2.3"
 indicatif = "0.17"
 log = "0.4"
