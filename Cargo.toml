@@ -57,7 +57,7 @@ noodles-sam = "0.49"
 petgraph = { version = "0.6", features = ["serde-1"] }
 plotters = { version = "0.3" }
 
-polars = { version = "0.36", features = ["lazy", "nightly"] }
+polars = { version = "0.37", features = ["lazy", "nightly"] }
 rayon = { version = "1.8" }
 regex = { version = "1.10" }
 serde = { version = "1.0" }
