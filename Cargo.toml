@@ -50,7 +50,7 @@ log = "0.4"
 noodles-bam = "0.52.0"
 noodles-bgzf = "0.26"
 noodles-csi = "0.29"
-noodles-fasta = "0.31"
+noodles-fasta = "0.32"
 noodles-fastq = "0.10"
 noodles-sam = "0.49"
 
