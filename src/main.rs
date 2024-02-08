@@ -14,7 +14,7 @@ mod fq2fa;
 mod index;
 mod rsoft;
 
-mod anno;
+// mod anno;
 mod graph;
 
 #[derive(Parser, Debug)]
@@ -91,9 +91,8 @@ enum Commands {
 
     /// Graph Analysis
     Graph(graph::GraphArgs),
-
-    /// Annotation scannls
-    AnnoScan(anno::AnnoArgs),
+    // Annotation scannls
+    // AnnoScan(anno::AnnoArgs),
 }
 
 fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
@@ -168,12 +167,14 @@ fn main() {
             graph::analyze(args).unwrap();
         }
 
-        Some(Commands::AnnoScan(args)) => {
-            info!("'anno'  {args:?} ");
-            anno::run_poa(&args.vcf).unwrap();
-        }
+        // Some(Commands::AnnoScan(args)) => {
+        //     info!("'anno'  {args:?} ");
+        //     anno::run_poa(&args.vcf).unwrap();
+        // }
 
-        // If no subcommand was used, it's a normal top level command
+        // // If no subcommand was used, it's a normal top level command
         None => info!("No subcommand was used"),
+
+        _ => info!("Subcommand not implemented yet!"),
     }
 }

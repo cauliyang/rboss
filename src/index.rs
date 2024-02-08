@@ -1,24 +1,35 @@
 use std::io;
 use std::path::Path;
 
+use noodles_core::Position;
+
 use noodles_bam::{self as bam, bai};
 use noodles_csi::binning_index::{index::reference_sequence::bin::Chunk, Indexer};
-use noodles_sam::{self as sam, alignment::Record};
+use noodles_sam::{self as sam};
+use sam::alignment::RecordBuf;
 
 fn is_coordinate_sorted(header: &sam::Header) -> bool {
-    use sam::header::record::value::map::header::SortOrder;
+    use sam::header::record::value::map::header::{sort_order, tag};
 
-    if let Some(hdr) = header.header() {
-        if let Some(sort_order) = hdr.sort_order() {
-            return sort_order == SortOrder::Coordinate;
-        }
-    }
+    header
+        .header()
+        .and_then(|hdr| hdr.other_fields().get(&tag::SORT_ORDER))
+        .map(|sort_order| sort_order == sort_order::COORDINATE)
+        .unwrap_or_default()
+}
 
-    false
+fn alignment_context(
+    record: &sam::alignment::RecordBuf,
+) -> io::Result<(Option<usize>, Option<Position>, Option<Position>)> {
+    Ok((
+        record.reference_sequence_id(),
+        record.alignment_start(),
+        record.alignment_end(),
+    ))
 }
 
 pub fn index_bam<P: AsRef<Path>, W: io::Write>(file: P, index_file: Option<W>) -> io::Result<()> {
-    let mut reader = bam::reader::Builder.build_from_path(file.as_ref())?;
+    let mut reader = bam::io::reader::Builder.build_from_path(file.as_ref())?;
     let header = reader.read_header()?;
 
     if !is_coordinate_sorted(&header) {
@@ -28,22 +39,19 @@ pub fn index_bam<P: AsRef<Path>, W: io::Write>(file: P, index_file: Option<W>) -
         ));
     }
 
-    let mut record = Record::default();
+    let mut record = RecordBuf::default();
 
     let mut builder = Indexer::default();
     let mut start_position = reader.virtual_position();
 
-    while reader.read_record(&header, &mut record)? != 0 {
+    while reader.read_record_buf(&header, &mut record)? != 0 {
         let end_position = reader.virtual_position();
         let chunk = Chunk::new(start_position, end_position);
 
-        let alignment_context = match (
-            record.reference_sequence_id(),
-            record.alignment_start(),
-            record.alignment_end(),
-        ) {
+        let alignment_context = match alignment_context(&record)? {
             (Some(id), Some(start), Some(end)) => {
-                Some((id, start, end, !record.flags().is_unmapped()))
+                let is_mapped = !record.flags().is_unmapped();
+                Some((id, start, end, is_mapped))
             }
             _ => None,
         };

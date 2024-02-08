@@ -9,7 +9,7 @@ pub fn fa2fq<P: AsRef<Path>>(input: P) -> Result<()> {
 
     for result in reader.records() {
         let record = result?;
-        let name = record.name().to_string();
+        let name = record.name();
         let sequence = record.sequence().as_ref().to_vec();
         let qualities = vec![b'@'; sequence.len()];
         let fastq_record = fastq::Record::new(
