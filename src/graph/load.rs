@@ -33,7 +33,6 @@ pub fn load_cygraph_from_json(data: Value) -> Result<NLGraph> {
     let edge_number = edges.as_array().unwrap().len();
 
     let mut graph = NLGraph::with_capacity(node_number, edge_number);
-
     let mut id2index = HashMap::new();
 
     for node in nodes.as_array().unwrap() {

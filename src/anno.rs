@@ -1,11 +1,12 @@
+use noodles_bam::{self as bam};
+
 use anyhow::Result;
 use clap::{arg, Args, ValueHint};
 use log::{error, info, warn};
+use noodles_sam::alignment::Record;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use polars::df;
-use polars::prelude::*;
 use std::io::{self, BufRead}; // Add this line
 
 use bio::alignment::pairwise::Scoring;
@@ -131,8 +132,25 @@ pub fn read_vcf<P: AsRef<Path>>(vcf_path: P) -> Result<Vec<VcfRecord>> {
         .collect::<Vec<VcfRecord>>())
 }
 
-pub fn read_bam<P: AsRef<Path>>(bam_path: P) {
-    todo!()
+pub fn read_bam<P: AsRef<Path>>(bam_path: P, read_names: &[&str]) -> Result<Vec<Record>> {
+    let mut reader = bam::reader::Builder.build_from_path(bam_path.as_ref())?;
+    let header = reader.read_header()?;
+
+    let records: Vec<_> = reader
+        .records(&header)
+        .filter_map(|result| result.ok())
+        .filter(|record| {
+            read_names.contains(
+                &record
+                    .read_name()
+                    .map(|name| name.to_string())
+                    .unwrap_or_default()
+                    .as_str(),
+            )
+        })
+        .collect();
+
+    Ok(records)
 }
 
 pub fn read_fasta<P: AsRef<Path>>(fasta_path: P) {
