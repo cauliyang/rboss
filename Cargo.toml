@@ -49,13 +49,13 @@ env_logger = "0.11"
 human-panic = "1.2.3"
 indicatif = "0.17"
 log = "0.4"
-noodles-bam = "0.54.1"
+noodles-bam = "0.55"
 noodles-bgzf = "0.26"
 noodles-core = "0.14"
 noodles-csi = "0.30"
 noodles-fasta = "0.32"
 noodles-fastq = "0.10"
-noodles-sam = "0.51"
+noodles-sam = "0.52"
 
 petgraph = { version = "0.6", features = ["serde-1"] }
 plotters = { version = "0.3" }
