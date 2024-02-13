@@ -41,7 +41,7 @@ where
     let mut read_names = HashSet::new();
 
     for result in reader.lines() {
-        let read_name = result.map(|s| s.as_bytes().to_vec())?;
+        let read_name = result.map(|s| s.trim().as_bytes().to_vec())?;
         read_names.insert(read_name);
     }
 
@@ -61,7 +61,7 @@ fn parse_read_ids(read_ids: &str) -> Result<HashSet<Vec<u8>>> {
 
     read_ids
         .split(',')
-        .map(|id| Ok(id.as_bytes().to_vec())) // Replace with the actual method to create ReadName from &str
+        .map(|id| Ok(id.trim().as_bytes().to_vec())) // Replace with the actual method to create ReadName from &str
         .collect::<Result<HashSet<_>, _>>() // Assuming
 }
 
